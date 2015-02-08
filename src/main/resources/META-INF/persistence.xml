@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="MyJots-JPA-0.1-SNAPSHOT-PU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <class>org.jolab.myjots.jpa.model.AppuserHasJot</class>
+    <class>org.jolab.myjots.jpa.model.Approle</class>
+    <class>org.jolab.myjots.jpa.model.Jot</class>
+    <class>org.jolab.myjots.jpa.model.JotHistory</class>
+    <class>org.jolab.myjots.jpa.model.Link</class>
+    <class>org.jolab.myjots.jpa.model.Tag</class>
+    <class>org.jolab.myjots.jpa.model.JotReferJot</class>
+    <class>org.jolab.myjots.jpa.model.Appuser</class>
+    <class>org.jolab.myjots.AppuserHasJot</class>
+    <class>org.jolab.myjots.JotReferJot</class>
+    <class>org.jolab.myjots.Approle</class>
+    <class>org.jolab.myjots.Appuser</class>
+    <class>org.jolab.myjots.Link</class>
+    <class>org.jolab.myjots.Jot</class>
+    <class>org.jolab.myjots.JotHistory</class>
+    <class>org.jolab.myjots.Role</class>
+    <class>org.jolab.myjots.User</class>
+    <class>org.jolab.myjots.JotUser</class>
+    <class>org.jolab.myjots.Tag</class>
+    <class>org.jolab.myjots.jpa.model.User</class>
+    <class>org.jolab.myjots.jpa.model.JotUser</class>
+    <class>org.jolab.myjots.jpa.model.Role</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/MyJotsDB?zeroDateTimeBehavior=convertToNull"/>
+      <property name="javax.persistence.jdbc.password" value=""/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.user" value="root"/>
+      <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+      <property name="javax.persistence.schema-generation.database.action" value="none"/>
+    </properties>
+  </persistence-unit>
+</persistence>
