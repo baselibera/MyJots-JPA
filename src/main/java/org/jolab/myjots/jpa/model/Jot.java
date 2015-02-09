@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,12 +63,10 @@ public class Jot implements Serializable {
     private int status;
     @Column(name = "mimeType")
     private String mimeType;
-    
-    //@Basic(optional = false)
+    @Basic(optional = false)
     @Column(name = "createTime")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
-    
     @Column(name = "updateTime")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
@@ -78,7 +77,7 @@ public class Jot implements Serializable {
     private List<Tag> tagList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idJot")
     private List<Link> linkList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "jot")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "idJot")
     private List<JotHistory> jotHistoryList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "jot")
     private List<JotUser> jotUserList;

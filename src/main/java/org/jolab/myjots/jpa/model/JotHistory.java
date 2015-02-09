@@ -8,8 +8,10 @@ package org.jolab.myjots.jpa.model;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -27,46 +29,53 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "JotHistory.findAll", query = "SELECT j FROM JotHistory j"),
-    @NamedQuery(name = "JotHistory.findByIdJotHistory", query = "SELECT j FROM JotHistory j WHERE j.jotHistoryPK.idJotHistory = :idJotHistory"),
-    @NamedQuery(name = "JotHistory.findByIdJot", query = "SELECT j FROM JotHistory j WHERE j.jotHistoryPK.idJot = :idJot"),
+    @NamedQuery(name = "JotHistory.findByIdJotHistory", query = "SELECT j FROM JotHistory j WHERE j.idJotHistory = :idJotHistory"),
+    @NamedQuery(name = "JotHistory.findByIdJot", query = "SELECT j FROM JotHistory j WHERE j.idJot.idJot = :idJot"),
     @NamedQuery(name = "JotHistory.findBySavedate", query = "SELECT j FROM JotHistory j WHERE j.savedate = :savedate")})
 public class JotHistory implements Serializable {
-    @Lob
-    private byte[] object;
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected JotHistoryPK jotHistoryPK;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "idJotHistory")
+    private Integer idJotHistory;
+    @Lob
+    @Column(name = "object")
+    private byte[] object;
     @Basic(optional = false)
     @Column(name = "savedate")
     private String savedate;
-    @JoinColumn(name = "idJot", referencedColumnName = "idJot", insertable = false, updatable = false)
+    @JoinColumn(name = "idJot", referencedColumnName = "idJot")
     @ManyToOne(optional = false)
-    private Jot jot;
+    private Jot idJot;
 
     public JotHistory() {
     }
 
-    public JotHistory(JotHistoryPK jotHistoryPK) {
-        this.jotHistoryPK = jotHistoryPK;
+    public JotHistory(Integer idJotHistory) {
+        this.idJotHistory = idJotHistory;
     }
 
-    public JotHistory(JotHistoryPK jotHistoryPK, String savedate) {
-        this.jotHistoryPK = jotHistoryPK;
+    public JotHistory(Integer idJotHistory, String savedate) {
+        this.idJotHistory = idJotHistory;
         this.savedate = savedate;
     }
 
-    public JotHistory(int idJotHistory, int idJot) {
-        this.jotHistoryPK = new JotHistoryPK(idJotHistory, idJot);
+    public Integer getIdJotHistory() {
+        return idJotHistory;
     }
 
-    public JotHistoryPK getJotHistoryPK() {
-        return jotHistoryPK;
+    public void setIdJotHistory(Integer idJotHistory) {
+        this.idJotHistory = idJotHistory;
     }
 
-    public void setJotHistoryPK(JotHistoryPK jotHistoryPK) {
-        this.jotHistoryPK = jotHistoryPK;
+    public byte[] getObject() {
+        return object;
     }
 
+    public void setObject(byte[] object) {
+        this.object = object;
+    }
 
     public String getSavedate() {
         return savedate;
@@ -76,18 +85,18 @@ public class JotHistory implements Serializable {
         this.savedate = savedate;
     }
 
-    public Jot getJot() {
-        return jot;
+    public Jot getIdJot() {
+        return idJot;
     }
 
-    public void setJot(Jot jot) {
-        this.jot = jot;
+    public void setIdJot(Jot idJot) {
+        this.idJot = idJot;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (jotHistoryPK != null ? jotHistoryPK.hashCode() : 0);
+        hash += (idJotHistory != null ? idJotHistory.hashCode() : 0);
         return hash;
     }
 
@@ -98,7 +107,7 @@ public class JotHistory implements Serializable {
             return false;
         }
         JotHistory other = (JotHistory) object;
-        if ((this.jotHistoryPK == null && other.jotHistoryPK != null) || (this.jotHistoryPK != null && !this.jotHistoryPK.equals(other.jotHistoryPK))) {
+        if ((this.idJotHistory == null && other.idJotHistory != null) || (this.idJotHistory != null && !this.idJotHistory.equals(other.idJotHistory))) {
             return false;
         }
         return true;
@@ -106,15 +115,7 @@ public class JotHistory implements Serializable {
 
     @Override
     public String toString() {
-        return "org.jolab.myjots.jpa.model.JotHistory[ jotHistoryPK=" + jotHistoryPK + " ]";
-    }
-
-    public byte[] getObject() {
-        return object;
-    }
-
-    public void setObject(byte[] object) {
-        this.object = object;
+        return "org.jolab.myjots.jpa.model.JotHistory[ idJotHistory=" + idJotHistory + " ]";
     }
     
 }

@@ -11,19 +11,20 @@ SHOW WARNINGS;
 USE `MyJotsDB` ;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`jot`
+-- Table `MyJotsDB`.`Jot`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`jot` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`Jot` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`jot` (
-  `pkjot` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`Jot` (
+  `idJot` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(128) NOT NULL,
   `body` TEXT NOT NULL,
-  `mimetype` VARCHAR(45) NULL DEFAULT 'text/plain',
-  `createtime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatetime` DATETIME NULL,
-  PRIMARY KEY (`pkjot`))
+  `status` INT(1) NOT NULL DEFAULT 0,
+  `mimeType` VARCHAR(45) NULL DEFAULT 'text/plain',
+  `createTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateTime` DATETIME NULL,
+  PRIMARY KEY (`idJot`))
 ENGINE = InnoDB;
 
 SHOW WARNINGS;
@@ -35,36 +36,36 @@ DROP TABLE IF EXISTS `MyJotsDB`.`tag` ;
 
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `MyJotsDB`.`tag` (
-  `idtag` INT NOT NULL AUTO_INCREMENT,
+  `idTag` INT NOT NULL AUTO_INCREMENT,
   `value` VARCHAR(30) NOT NULL,
   `description` VARCHAR(255) NULL,
   `category` VARCHAR(30) NULL,
-  PRIMARY KEY (`idtag`),
+  PRIMARY KEY (`idTag`),
   UNIQUE INDEX `value_UNIQUE` (`value` ASC))
 ENGINE = InnoDB;
 
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`jot_has_tag`
+-- Table `MyJotsDB`.`Jot_Tag`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`jot_has_tag` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`Jot_Tag` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`jot_has_tag` (
-  `jot_pkjot` INT NOT NULL,
-  `tag_idtag` INT NOT NULL,
-  PRIMARY KEY (`jot_pkjot`, `tag_idtag`),
-  INDEX `fk_jot_has_tag_tag1_idx` (`tag_idtag` ASC),
-  INDEX `fk_jot_has_tag_jot1_idx` (`jot_pkjot` ASC),
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`Jot_Tag` (
+  `idJot` INT NOT NULL,
+  `idTag` INT NOT NULL,
+  PRIMARY KEY (`idJot`, `idTag`),
+  INDEX `fk_jot_has_tag_tag1_idx` (`idTag` ASC),
+  INDEX `fk_jot_has_tag_jot1_idx` (`idJot` ASC),
   CONSTRAINT `fk_jot_has_tag_jot1`
-    FOREIGN KEY (`jot_pkjot`)
-    REFERENCES `MyJotsDB`.`jot` (`pkjot`)
+    FOREIGN KEY (`idJot`)
+    REFERENCES `MyJotsDB`.`Jot` (`idJot`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_jot_has_tag_tag1`
-    FOREIGN KEY (`tag_idtag`)
-    REFERENCES `MyJotsDB`.`tag` (`idtag`)
+    FOREIGN KEY (`idTag`)
+    REFERENCES `MyJotsDB`.`tag` (`idTag`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -72,58 +73,59 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`appuser`
+-- Table `MyJotsDB`.`User`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`appuser` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`User` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`appuser` (
-  `idappuser` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`User` (
+  `idAppUser` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(45) NOT NULL,
   `name` VARCHAR(45) NULL,
   `surname` VARCHAR(45) NULL,
   `email` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idappuser`),
+  `enabled` TINYINT(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`idAppUser`),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC))
 ENGINE = InnoDB;
 
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`approle`
+-- Table `MyJotsDB`.`Role`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`approle` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`Role` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`approle` (
-  `idrole` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`Role` (
+  `idRole` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
-  PRIMARY KEY (`idrole`))
+  PRIMARY KEY (`idRole`))
 ENGINE = InnoDB;
 
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`appuser_has_jot`
+-- Table `MyJotsDB`.`Jot_User`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`appuser_has_jot` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`Jot_User` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`appuser_has_jot` (
-  `appuser_idappuser` INT NOT NULL,
-  `jot_pkjot` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`Jot_User` (
+  `idAppUser` INT NOT NULL,
+  `idJot` INT NOT NULL,
   `isOwner` TINYINT(1) NULL DEFAULT 0,
-  PRIMARY KEY (`appuser_idappuser`, `jot_pkjot`),
-  INDEX `fk_appuser_has_jot_jot1_idx` (`jot_pkjot` ASC),
-  INDEX `fk_appuser_has_jot_appuser1_idx` (`appuser_idappuser` ASC),
+  PRIMARY KEY (`idAppUser`, `idJot`),
+  INDEX `fk_appuser_has_jot_jot1_idx` (`idJot` ASC),
+  INDEX `fk_appuser_has_jot_appuser1_idx` (`idAppUser` ASC),
   CONSTRAINT `fk_appuser_has_jot_appuser1`
-    FOREIGN KEY (`appuser_idappuser`)
-    REFERENCES `MyJotsDB`.`appuser` (`idappuser`)
+    FOREIGN KEY (`idAppUser`)
+    REFERENCES `MyJotsDB`.`User` (`idAppUser`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_appuser_has_jot_jot1`
-    FOREIGN KEY (`jot_pkjot`)
-    REFERENCES `MyJotsDB`.`jot` (`pkjot`)
+    FOREIGN KEY (`idJot`)
+    REFERENCES `MyJotsDB`.`Jot` (`idJot`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -131,25 +133,25 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`appuser_has_approle`
+-- Table `MyJotsDB`.`User_Role`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`appuser_has_approle` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`User_Role` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`appuser_has_approle` (
-  `appuser_idappuser` INT NOT NULL,
-  `approle_idrole` INT NOT NULL,
-  PRIMARY KEY (`appuser_idappuser`, `approle_idrole`),
-  INDEX `fk_appuser_has_approle_approle1_idx` (`approle_idrole` ASC),
-  INDEX `fk_appuser_has_approle_appuser1_idx` (`appuser_idappuser` ASC),
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`User_Role` (
+  `idAppUser` INT NOT NULL,
+  `idRole` INT NOT NULL,
+  PRIMARY KEY (`idAppUser`, `idRole`),
+  INDEX `fk_appuser_has_approle_approle1_idx` (`idRole` ASC),
+  INDEX `fk_appuser_has_approle_appuser1_idx` (`idAppUser` ASC),
   CONSTRAINT `fk_appuser_has_approle_appuser1`
-    FOREIGN KEY (`appuser_idappuser`)
-    REFERENCES `MyJotsDB`.`appuser` (`idappuser`)
+    FOREIGN KEY (`idAppUser`)
+    REFERENCES `MyJotsDB`.`User` (`idAppUser`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_appuser_has_approle_approle1`
-    FOREIGN KEY (`approle_idrole`)
-    REFERENCES `MyJotsDB`.`approle` (`idrole`)
+    FOREIGN KEY (`idRole`)
+    REFERENCES `MyJotsDB`.`Role` (`idRole`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -157,27 +159,27 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`jot_refer_jot`
+-- Table `MyJotsDB`.`JotReferJot`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`jot_refer_jot` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`JotReferJot` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`jot_refer_jot` (
-  `pkjot` INT NOT NULL,
-  `pkjot_referred` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`JotReferJot` (
+  `idJot` INT NOT NULL,
+  `idJotReferred` INT NOT NULL,
   `weight` INT NULL,
   `comment` VARCHAR(255) NULL,
-  PRIMARY KEY (`pkjot`, `pkjot_referred`),
-  INDEX `fk_jot_has_jot_jot2_idx` (`pkjot_referred` ASC),
-  INDEX `fk_jot_has_jot_jot1_idx` (`pkjot` ASC),
+  PRIMARY KEY (`idJot`, `idJotReferred`),
+  INDEX `fk_jot_has_jot_jot2_idx` (`idJotReferred` ASC),
+  INDEX `fk_jot_has_jot_jot1_idx` (`idJot` ASC),
   CONSTRAINT `fk_jot_has_jot_jot1`
-    FOREIGN KEY (`pkjot`)
-    REFERENCES `MyJotsDB`.`jot` (`pkjot`)
+    FOREIGN KEY (`idJot`)
+    REFERENCES `MyJotsDB`.`Jot` (`idJot`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_jot_has_jot_jot2`
-    FOREIGN KEY (`pkjot_referred`)
-    REFERENCES `MyJotsDB`.`jot` (`pkjot`)
+    FOREIGN KEY (`idJotReferred`)
+    REFERENCES `MyJotsDB`.`Jot` (`idJot`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -185,23 +187,23 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`link`
+-- Table `MyJotsDB`.`Link`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`link` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`Link` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`link` (
-  `idlink` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`Link` (
+  `idLink` INT NOT NULL AUTO_INCREMENT,
+  `idJot` INT NOT NULL,
   `URL` TEXT NOT NULL,
   `name` VARCHAR(45) NULL,
-  `createdate` DATETIME NOT NULL,
-  `verificationtime` VARCHAR(45) NULL,
-  `jot_pkjot` INT NOT NULL,
-  PRIMARY KEY (`idlink`),
-  INDEX `fk_link_jot1_idx` (`jot_pkjot` ASC),
+  `createDate` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `verificatioDate` DATETIME NULL,
+  PRIMARY KEY (`idLink`),
+  INDEX `fk_link_jot1_idx` (`idJot` ASC),
   CONSTRAINT `fk_link_jot1`
-    FOREIGN KEY (`jot_pkjot`)
-    REFERENCES `MyJotsDB`.`jot` (`pkjot`)
+    FOREIGN KEY (`idJot`)
+    REFERENCES `MyJotsDB`.`Jot` (`idJot`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -209,21 +211,21 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `MyJotsDB`.`jot_history`
+-- Table `MyJotsDB`.`JotHistory`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `MyJotsDB`.`jot_history` ;
+DROP TABLE IF EXISTS `MyJotsDB`.`JotHistory` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `MyJotsDB`.`jot_history` (
-  `pkjot_history` INT NOT NULL AUTO_INCREMENT,
-  `jot_pkjot` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `MyJotsDB`.`JotHistory` (
+  `idJotHistory` INT NOT NULL AUTO_INCREMENT,
+  `idJot` INT NOT NULL,
   `object` BLOB NULL,
-  `savedate` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`pkjot_history`, `jot_pkjot`),
-  INDEX `fk_jot_history_jot1_idx` (`jot_pkjot` ASC),
+  `savedate` VARCHAR(45) NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+  PRIMARY KEY (`idJotHistory`),
+  INDEX `fk_jot_history_jot1_idx` (`idJot` ASC),
   CONSTRAINT `fk_jot_history_jot1`
-    FOREIGN KEY (`jot_pkjot`)
-    REFERENCES `MyJotsDB`.`jot` (`pkjot`)
+    FOREIGN KEY (`idJot`)
+    REFERENCES `MyJotsDB`.`Jot` (`idJot`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -242,4 +244,3 @@ SHOW WARNINGS;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-

@@ -24,6 +24,14 @@
     <class>org.jolab.myjots.jpa.model.User</class>
     <class>org.jolab.myjots.jpa.model.JotUser</class>
     <class>org.jolab.myjots.jpa.model.Role</class>
+    <class>org.jolab.myjots.model.Tag</class>
+    <class>org.jolab.myjots.model.Link</class>
+    <class>org.jolab.myjots.model.Jot</class>
+    <class>org.jolab.myjots.model.Role</class>
+    <class>org.jolab.myjots.model.JotHistory</class>
+    <class>org.jolab.myjots.model.User</class>
+    <class>org.jolab.myjots.model.JotReferJot</class>
+    <class>org.jolab.myjots.model.JotUser</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/MyJotsDB?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.password" value=""/>
