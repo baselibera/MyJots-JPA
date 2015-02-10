@@ -14,8 +14,8 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import org.jolab.myjots.controller.standalone.JotHistoryDao;
-import org.jolab.myjots.controller.standalone.JotSADao;
+import org.jolab.myjots.jpa.controller.standalone.JotHistoryDao;
+import org.jolab.myjots.jpa.controller.standalone.JotSADao;
 import org.jolab.myjots.jpa.model.Jot;
 import org.jolab.myjots.jpa.model.JotHistory;
 import org.junit.AfterClass;
@@ -93,7 +93,7 @@ public class JotJpaControllerTest {
         Integer idJot = new Integer(7);
         Jot retrievedJot = (Jot)jotDao.findByPk(idJot);
         List list = retrievedJot.getJotHistoryList();
-        System.out.println("list: " + list.toArray());
+        assertNotNull("Null List object querying for Jots", list);
     }
     
     
