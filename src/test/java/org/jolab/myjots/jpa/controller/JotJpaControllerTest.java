@@ -8,12 +8,15 @@ package org.jolab.myjots.jpa.controller;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import org.jolab.myjots.jpa.controller.standalone.JotHistoryDao;
 import org.jolab.myjots.jpa.controller.standalone.JotSADao;
 import org.jolab.myjots.jpa.model.Jot;
@@ -39,7 +42,7 @@ public class JotJpaControllerTest {
     }
     
     @BeforeClass
-    public static void setUpClass() {
+    public static void setUpClass() throws Exception {
         System.out.println("Init... Prepare Entity Manager Factory");
         JotJpaControllerTest.emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
         if(emFactory==null)
@@ -59,10 +62,15 @@ public class JotJpaControllerTest {
         }        
         
         System.out.println("Initialization finished... " );
+        
+        insertJotRecords(em);
+        
     }
     
     @AfterClass
-    public static void tearDownClass() {
+    public static void tearDownClass() throws Exception {
+        deleteJotRecords(JotJpaControllerTest.em);
+        
         try{
             JotJpaControllerTest.em.close();
             JotJpaControllerTest.emFactory.close();
@@ -70,7 +78,46 @@ public class JotJpaControllerTest {
             
         }
         
+        
     }
+    
+    private static void insertJotRecords(EntityManager em) throws Exception{
+        executeSQLScriptFromBundle(em, "insertjot.");
+    }
+
+    private static void deleteJotRecords(EntityManager em) throws Exception{
+        executeSQLScriptFromBundle(em, "deletejot.");
+    }
+    
+    
+    private static void executeSQLScriptFromBundle(EntityManager em, String prefix) throws Exception{
+        ResourceBundle res = ResourceBundle.getBundle("Bundle");
+        Enumeration<String> sqlStatements = res.getKeys();
+        em.getTransaction().begin();
+        boolean rollback = false;
+        while (sqlStatements.hasMoreElements()) {
+            String insertKey = sqlStatements.nextElement();
+            if(insertKey.startsWith(prefix)){
+                String sqlScript = res.getString(insertKey);
+                try{
+                    Query q = em.createNativeQuery(sqlScript);
+                    q.executeUpdate();          
+                }catch(Exception e){
+                    e.printStackTrace();
+                    rollback=true;
+                    break;
+                }
+            }
+        }
+        if(rollback){
+            em.getTransaction().rollback();
+            throw new Exception("Error during Tests initialization");
+        }else{
+            em.getTransaction().commit();
+        }
+        
+    }
+   
     
     /*
     @Before and @After are executed for each @Test annotated method
@@ -86,16 +133,7 @@ public class JotJpaControllerTest {
         // System.out.println("tearDown");
     }
     */
-    @Test
-    public void testFetch(){
-        EntityManager em = emFactory.createEntityManager();
-        JotSADao jotDao = new JotSADao(em);
-        Integer idJot = new Integer(7);
-        Jot retrievedJot = (Jot)jotDao.findByPk(idJot);
-        List list = retrievedJot.getJotHistoryList();
-        assertNotNull("Null List object querying for Jots", list);
-    }
-    
+        
     
     @Test
     public void testSAJotDaoFacade(){
@@ -103,7 +141,7 @@ public class JotJpaControllerTest {
         JotSADao jotDao = new JotSADao(em);
         
         //Create a new Jot Record...
-        Jot jot = new Jot();
+            Jot jot = new Jot();
         jot.setTitle("Note Title");
         jot.setBody("This is the body for this example Jot. Other more significan test could be done but this minimum if suffice, for now.");
         jot.setMimeType("text/plain");

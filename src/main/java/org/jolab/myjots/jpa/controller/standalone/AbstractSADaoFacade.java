@@ -7,15 +7,15 @@ package org.jolab.myjots.jpa.controller.standalone;
 
 import java.util.List;
 import javax.persistence.EntityManager;
-import org.jolab.myjots.jpa.model.Jot;
-import org.jolab.myjots.jpa.model.Tag;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
 
 /**
  *
  * @author jolab
  */
 public abstract class AbstractSADaoFacade<T> {
-    private final Class<T> entityClass;
+    protected final Class<T> entityClass;
 
     public AbstractSADaoFacade(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -100,4 +100,19 @@ public abstract class AbstractSADaoFacade<T> {
     }    
     
     
+    private List<T> findWithPagination(boolean all, int maxResults, int firstResult) {
+        
+        try {
+            CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
+            cq.select(cq.from(entityClass));
+            Query q = getEntityManager().createQuery(cq);
+            if (!all) {
+                q.setMaxResults(maxResults);
+                q.setFirstResult(firstResult);
+            }
+            return q.getResultList();
+        } finally {
+            
+        }
+    }
 }
