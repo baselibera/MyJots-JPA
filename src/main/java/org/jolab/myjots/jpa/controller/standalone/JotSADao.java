@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jolab.myjots.controller.standalone;
+package org.jolab.myjots.jpa.controller.standalone;
 
 import javax.persistence.EntityManager;
 import org.jolab.myjots.jpa.model.Jot;
