@@ -153,14 +153,14 @@ public class JotJpaControllerTest {
         
         // Retrieve the just inserted record as jpa object
         Integer idJot = jot.getIdJot();
-        Jot retrievedJot = (Jot)jotDao.findByPk(idJot);
+        Jot retrievedJot = jotDao.findByPk(idJot);
         
         // Modify mapped object in some property
         StringBuilder newBody = new StringBuilder("##Modified##.");
         String oldBody = retrievedJot.getBody();
         retrievedJot.setBody( newBody.append(retrievedJot.getBody()).toString());
         retrievedJot.setUpdateTime(new Date());
-        Jot editedJot = (Jot)jotDao.edit(retrievedJot);
+        Jot editedJot = jotDao.edit(retrievedJot);
         assertTrue("Record seems to be not modified yet.", editedJot.getBody().contains("##Modified##"));
         
         // Prepare and create history record
@@ -186,7 +186,7 @@ public class JotJpaControllerTest {
         // we remove also children objects
         jotDao.remove(retrievedJot);
         
-        Jot deletedJot = (Jot)jotDao.findByPk(idJot);
+        Jot deletedJot = jotDao.findByPk(idJot);
         assertNull("Jot not removed!", deletedJot);
         
     }
@@ -200,6 +200,26 @@ public class JotJpaControllerTest {
         
         return jotHistory;
     }
+    
+    
+    @Test
+    public void testRangeResults(){
+        EntityManager em = emFactory.createEntityManager();
+        JotSADao jotDao = new JotSADao(em);
+        
+        String searchString = "consectetur";
+        List<Jot> jotList = jotDao.findJotsLike(searchString);
+        
+        assertNotNull(jotList);
+        assertTrue(jotList.size()==3); // its imposed by the prepared insert statement in Bundle.properties
+        
+        // II level validation
+        for (Jot jot : jotList) {
+			assertTrue(jot.getBody().contains(searchString) || jot.getTitle().contains(searchString));
+		}
+        
+    }
+
     
     /**
      * Test of getJotCount method, of class JotJpaController.
