@@ -15,6 +15,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import org.jolab.myjots.jpa.controller.standalone.JotHistoryDao;
@@ -136,12 +137,12 @@ public class JotJpaControllerTest {
         
     
     @Test
-    public void testSAJotDaoFacade(){
+    public void testSAJotDaoFacade() throws Exception{
         EntityManager em = emFactory.createEntityManager();
         JotSADao jotDao = new JotSADao(em);
         
         //Create a new Jot Record...
-            Jot jot = new Jot();
+        Jot jot = new Jot();
         jot.setTitle("Note Title");
         jot.setBody("This is the body for this example Jot. Other more significan test could be done but this minimum if suffice, for now.");
         jot.setMimeType("text/plain");
@@ -215,11 +216,93 @@ public class JotJpaControllerTest {
         
         // II level validation
         for (Jot jot : jotList) {
-			assertTrue(jot.getBody().contains(searchString) || jot.getTitle().contains(searchString));
-		}
+		assertTrue(jot.getBody().contains(searchString) || jot.getTitle().contains(searchString));
+	}
         
     }
 
+    
+    @Test 
+    public void testTransactionFail(){
+        EntityManager em = emFactory.createEntityManager();
+        JotSADao jotDao = new JotSADao(em);
+        
+        Jot firstJot = new Jot();
+        firstJot.setTitle("First Transaction Test Title");
+        firstJot.setBody("#TEST∞TRANSACTION#");
+        firstJot.setMimeType("text/plain");
+        firstJot.setStatus(1);
+        firstJot.setCreateTime(new Date());        
+
+        Jot secondJot = new Jot();
+        secondJot.setTitle("Note Title");
+        secondJot.setBody("This is the body for this example Jot. Other more significan test could be done but this minimum if suffice, for now.");
+        secondJot.setMimeType("text/plain");
+        secondJot.setStatus(1);
+        secondJot.setCreateTime(new Date());        
+        
+        EntityTransaction testTransaction = em.getTransaction();
+        testTransaction.begin();
+        try{
+            jotDao.create(firstJot, testTransaction);
+        }catch(Exception e){}
+        testTransaction.rollback();
+        Jot firstRetrievedJot = jotDao.findByPk(firstJot.getIdJot());
+        assertNull(firstRetrievedJot);
+        
+        testTransaction.begin();
+        try{
+            jotDao.create(firstJot, testTransaction);
+            jotDao.create(secondJot, testTransaction);
+        }catch(Exception e){}
+        testTransaction.rollback();
+        firstRetrievedJot = jotDao.findByPk(firstJot.getIdJot());
+        Jot secondRetrievedJot = jotDao.findByPk(firstJot.getIdJot());
+        assertNull(firstRetrievedJot);
+        assertNull(secondRetrievedJot);
+        
+    }
+    
+    
+    @Test
+    public void testTransactionOk(){
+        EntityManager em = emFactory.createEntityManager();
+        JotSADao jotDao = new JotSADao(em);
+        EntityTransaction testTransaction = em.getTransaction();
+        
+        Jot firstJot = new Jot();
+        firstJot.setTitle("First Transaction Test Title");
+        firstJot.setBody("#TEST∞TRANSACTION#");
+        firstJot.setMimeType("text/plain");
+        firstJot.setStatus(1);
+        firstJot.setCreateTime(new Date());        
+
+        Jot secondJot = new Jot();
+        secondJot.setTitle("Note Title");
+        secondJot.setBody("#TEST∞TRANSACTION");
+        secondJot.setMimeType("text/plain");
+        secondJot.setStatus(1);
+        secondJot.setCreateTime(new Date());  
+
+        testTransaction.begin();
+        try{
+            jotDao.create(firstJot, testTransaction);
+            jotDao.create(secondJot, testTransaction);
+        }catch(Exception e){}
+        testTransaction.commit();
+        Jot firstRetrievedJot = jotDao.findByPk(firstJot.getIdJot());
+        Jot secondRetrievedJot = jotDao.findByPk(firstJot.getIdJot());
+        assertNotNull(firstRetrievedJot);
+        assertNotNull(secondRetrievedJot);        
+        
+        jotDao.remove(firstJot);
+        jotDao.remove(secondJot);
+        firstRetrievedJot = jotDao.findByPk(firstJot.getIdJot());
+        secondRetrievedJot = jotDao.findByPk(firstJot.getIdJot());
+        assertNull(firstRetrievedJot);
+        assertNull(secondRetrievedJot);          
+        
+    }
     
     /**
      * Test of getJotCount method, of class JotJpaController.

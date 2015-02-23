@@ -7,11 +7,14 @@ package org.jolab.myjots.jpa.controller.standalone;
 
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 
 /**
- *
+ * This class represnt an abstract DAO pattern Facede and define the mininal 
+ * common behavior of DAO for the database access.
+ * 
  * @author jolab
  */
 public abstract class AbstractSADaoFacade<T> {
@@ -23,17 +26,26 @@ public abstract class AbstractSADaoFacade<T> {
 
     protected abstract EntityManager getEntityManager();
 
-    public void create(T entity) {
-        EntityManager em = getEntityManager();
-        try{
-            em.getTransaction().begin();
+    
+    public void create(T entity, EntityTransaction transaction) throws Exception{
+        if(transaction.isActive()){
+            EntityManager em = getEntityManager();
             em.persist(entity);
             em.flush();
-            em.getTransaction().commit();
+        }else{
+            throw new Exception("Call this method if you want to manage transaction begin/commit/rollback by yourself. Otherwise call create(entity) method");
+        }
+    }
+    
+    public void create(T entity) throws Exception{
+        EntityTransaction transaction = getEntityManager().getTransaction();
+        transaction.begin();
+        try{
+            create(entity, transaction);
+            transaction.commit();
         }catch(Exception e){
-            em.getTransaction().rollback();
-        }finally{
-            
+            transaction.rollback();
+            throw e;
         }
     }
 
